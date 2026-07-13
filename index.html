@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مايكرو فصيل شرطة هوميلاند</title>
+    <!-- استيراد خط Tajawal الفخم -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* إعدادات الألوان والتصميم */
+        :root {
+            --bg-color: #0b0b0b; /* أسود داكن فخم */
+            --card-bg: #141414; /* أسود رمادي للكروت */
+            --gold-primary: #d4af37; /* ذهبي ناصع ولامع */
+            --gold-glow: rgba(212, 175, 55, 0.4); /* توهج ذهبي */
+            --text-color: #ffffff; /* أبيض ناصع للنصوص */
+            --text-muted: #a6a6a6; /* رمادي مائل للذهبي الخفيف */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* الهيدر (رأس الصفحة) */
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 650px;
+        }
+
+        header h1 {
+            color: var(--gold-primary);
+            font-size: 26px;
+            font-weight: 900;
+            text-shadow: 0 0 15px var(--gold-glow);
+            border-bottom: 2px solid var(--gold-primary);
+            padding-bottom: 15px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* حاوية الأقسام */
+        .container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* حاوية كل قسم */
+        .section-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* العناوين الرئيسية للأقسام */
+        .section-title {
+            background: linear-gradient(135deg, #161616 30%, #d4af37 150%);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            border-right: 5px solid var(--gold-primary);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* كروت الأوامر */
+        .macro-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .macro-card:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* نص المخالفة/الأمر */
+        .macro-text {
+            flex-grow: 1;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #f0f0f0;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        /* أزرار النسخ الذهبية */
+        .copy-btn {
+            background-color: transparent;
+            color: var(--gold-primary);
+            border: 2px solid var(--gold-primary);
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--gold-primary);
+            color: #000;
+            box-shadow: 0 0 10px var(--gold-primary);
+        }
+
+        /* حالة تم النسخ بنجاح */
+        .copy-btn.copied {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+            box-shadow: 0 0 10px #28a745;
+        }
+
+        /* نافذة التنبيه العائمة بالأسفل */
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--gold-primary);
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            opacity: 0;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الهيدر الرئيسي -->
+    <header>
+        <h1>مايكرو فصيل شرطة هوميلاند</h1>
+        <p>نظام النسخ السريع واللوائح العسكرية المعتمدة</p>
+    </header>
+
+    <!-- حاوية المايكرو الرئيسية -->
+    <div class="container">
+
+        <!-- أولاً: التحذيرات والحقوق -->
+        <div class="section-block">
+            <div class="section-title">📢 أولاً: التحذيرات والحقوق</div>
+            
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/do تحذير الشرطة هنا، إذا لم تتوقف، سأستخدم الصاعق ضدكم !!!!؟')">نسخ</button>
+                <div class="macro-text">/do تحذير الشرطة هنا، إذا لم تتوقف، سأستخدم الصاعق ضدكم !!!!؟</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/do سيدي سيدتي اخفضوا أسلحتكم وإلا سنستخدم الصاعق ضدكم!!!')">نسخ</button>
+                <div class="macro-text">/do سيدي سيدتي اخفضوا أسلحتكم وإلا سنستخدم الصاعق ضدكم!!!</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/do تواجدك لأكثر من دقيقة داخل المنطقة !! يتسبب في اعتقالك !! يرجى المغادرة الان او سوف يتم اعتقالك !!!')">نسخ</button>
+                <div class="macro-text">/do تواجدك لأكثر من دقيقة داخل المنطقة !! يتسبب في اعتقالك !! يرجى المغادرة الان او سوف يتم اعتقالك !!!</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/me مرحبا سيدي سيدتي، أحتاج إلى رؤية جواز سفرك يرجى التعاون معنا')">نسخ</button>
+                <div class="macro-text">/me مرحبا سيدي سيدتي، أحتاج إلى رؤية جواز سفرك يرجى التعاون معنا</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/me جواز سفرك نضيف شكرا سيدي/سيدتي على دعمكم، أتمنى لك يوما سعيدا')">نسخ</button>
+                <div class="macro-text">/me جواز سفرك نضيف شكرا سيدي/سيدتي على دعمكم، أتمنى لك يوما سعيدا</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/do أنا الضابط (اسمك) سيدي سيدتي، أنا أعتقلك بسبب مخالفتك للأنظمة والقوانين السارية في الدولة لديك الحق في التزام الصمت والحصول على محام')">نسخ</button>
+                <div class="macro-text">/do أنا الضابط (اسمك) سيدي سيدتي، أنا أعتقلك بسبب مخالفتك للأنظمة والقوانين السارية في الدولة لديك الحق في التزام الصمت والحصول على محام</div>
+            </div>
+        </div>
+
+        <!-- ثانياً: أوامر الراديو -->
+        <div class="section-block">
+            <div class="section-title">📻 ثانياً: أوامر الراديو</div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby في الخدمة')">نسخ</button>
+                <div class="macro-text">/flobby في الخدمة</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby خارج الخدمة')">نسخ</button>
+                <div class="macro-text">/flobby خارج الخدمة</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby طلب اذن دخول للطابق الثاني لاكمال مهام الدورية')">نسخ</button>
+                <div class="macro-text">/flobby طلب اذن دخول للطابق الثاني لاكمال مهام الدورية</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby الموقع')">نسخ</button>
+                <div class="macro-text">/flobby الموقع</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby فالطريق')">نسخ</button>
+                <div class="macro-text">/flobby فالطريق</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby طلب وحدة نقل')">نسخ</button>
+                <div class="macro-text">/flobby طلب وحدة نقل</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby طلب دعم')">نسخ</button>
+                <div class="macro-text">/flobby طلب دعم</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby العودة إلى المركز')">نسخ</button>
+                <div class="macro-text">/flobby العودة إلى المركز</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby إستجابة')">نسخ</button>
+                <div class="macro-text">/flobby إستجابة</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby حالة رهينة')">نسخ</button>
+                <div class="macro-text">/flobby حالة رهينة</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby إطلاق نار')">نسخ</button>
+                <div class="macro-text">/flobby إطلاق نار</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '/flobby الوضع آمن')">نسخ</button>
+                <div class="macro-text">/flobby الوضع آمن</div>
+            </div>
+        </div>
+
+        <!-- ثالثاً: الانتهاكات الجنائية -->
+        <div class="section-block">
+            <div class="section-title">🚨 ثالثاً: الانتهاكات الجنائية</div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.1 الاستيلاء على مؤسسات الدولة ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.1 الاستيلاء على مؤسسات الدولة ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.2 الاستيلاء على السلطة بالقوة ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.2 الاستيلاء على السلطة بالقوة ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.3 أخذ الرهائن أو الاختطاف ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.3 أخذ الرهائن أو الاختطاف ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.4 الاصطدام المميت بالمشاة ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.4 الاصطدام المميت بالمشاة ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.5 محاولة السرقة ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.5 محاولة السرقة ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.6 سرقة ضابط شرطة ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.6 سرقة ضابط شرطة ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.7 الدخول غير المنسق إلى الأراضي المحمية بالقانون ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.7 الدخول غير المنسق إلى الأراضي المحمية بالقانون ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.8 الاصطدام بالمشاة ]20+ دقيقة[')">نسخ</button>
+                <div class="macro-text">1.8 الاصطدام بالمشاة ]20+ دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.9 إشهار سلاح في مكان عام ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.9 إشهار سلاح في مكان عام ]+20 دقيقة[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '1.10 رشوة ضابط شرطة ]+20 دقيقة[')">نسخ</button>
+                <div class="macro-text">1.10 رشوة ضابط شرطة ]+20 دقيقة[</div>
+            </div>
+        </div>
+
+        <!-- رابعاً: الانتهاكات المدنية -->
+        <div class="section-block">
+            <div class="section-title">⚖️ رابعاً: الانتهاكات المدنية</div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '2.1 إتلاف ممتلكات الدولة ]+10 دقائق[')">نسخ</button>
+                <div class="macro-text">2.1 إتلاف ممتلكات الدولة ]+10 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '2.2 الاضرار أو تلف بالممتلكات الخاصة ]+10 دقائق[')">نسخ</button>
+                <div class="macro-text">2.2 الاضرار أو تلف بالممتلكات الخاصة ]+10 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '2.3 مكالمات كاذبة للشرطة و/أو خدمات الطوارئ ]+10 دقائق[')">نسخ</button>
+                <div class="macro-text">2.3 مكالمات كاذبة للشرطة و/أو خدمات الطوارئ ]+10 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '2.4 الفجور / تشغيل الموسيقى بعد أن يطلب منك إيقاف تشغيلها/البصق في وجه شخص ما، إلخ ]+10 دقائق[')">نسخ</button>
+                <div class="macro-text">2.4 الفجور / تشغيل الموسيقى بعد أن يطلب منك إيقاف تشغيلها/البصق في وجه شخص ما، إلخ ]+10 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '2.5 التهديد بالقتل ]+10 دقائق[')">نسخ</button>
+                <div class="macro-text">2.5 التهديد بالقتل ]+10 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '2.6 إهانة موظف حكومي ]+10 دقائق[')">نسخ</button>
+                <div class="macro-text">2.6 إهانة موظف حكومي ]+10 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '2.7 الابتزاز ]+10 دقائق[')">نسخ</button>
+                <div class="macro-text">2.7 الابتزاز ]+10 دقائق[</div>
+            </div>
+        </div>
+
+        <!-- خامساً: الانتهاكات الإدارية -->
+        <div class="section-block">
+            <div class="section-title">📂 خامساً: الانتهاكات الإدارية</div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '3.1 مقاومة الاعتقال ]+5 دقائق[')">نسخ</button>
+                <div class="macro-text">3.1 مقاومة الاعتقال ]+5 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '3.2 عصيان ضابط شرطة ]+5 دقائق[')">نسخ</button>
+                <div class="macro-text">3.2 عصيان ضابط شرطة ]+5 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '3.3 المساعدة في مقاومة الاعتقال ]+5 دقائق[')">نسخ</button>
+                <div class="macro-text">3.3 المساعدة في مقاومة الاعتقال ]+5 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '3.4 انتهاك قواعد المرور: القيادة في المسار المعاكس، الاصطدام بالأعمدة، تجاوز الإشارات الحمراء ]+5 دقائق[')">نسخ</button>
+                <div class="macro-text">3.4 انتهاك قواعد المرور: القيادة في المسار المعاكس، الاصطدام بالأعمدة، تجاوز الإشارات الحمراء ]+5 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '3.5 الإعتداء على مدني بالضرب ]+5 دقائق[')">نسخ</button>
+                <div class="macro-text">3.5 الإعتداء على مدني بالضرب ]+5 دقائق[</div>
+            </div>
+
+            <div class="macro-card">
+                <button class="copy-btn" onclick="copyText(this, '3.6 رفض تقديم المستندات المطلوبة: بطاقة الهوية، ومستندات السيارة، ورخص الأسلحة ]+5 دقائق[')">نسخ</button>
+                <div class="macro-text">3.6 رفض تقديم المستندات المطلوبة: بطاقة الهوية، ومستندات السيارة، ورخص الأسلحة ]+5 دقائق[</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- رسالة التنبيه العائمة -->
+    <div id="toast" class="toast">تم النسخ بنجاح! 📋</div>
+
+    <!-- السكربت البرمجي للتفاعلات -->
+    <script>
+        function copyText(button, text) {
+            // استخدام الـ API الحديث والآمن للنسخ في المتصفحات والهواتف
+            navigator.clipboard.writeText(text).then(() => {
+                // حفظ النص القديم للزر
+                const oldText = button.innerText;
+                
+                // تغيير حالة الزر فوراً
+                button.innerText = 'تم!';
+                button.classList.add('copied');
+
+                // إظهار التنبيه بأسفل الشاشة
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+
+                // إعادة العناصر لوضعها الافتراضي بعد ثانية ونصف
+                setTimeout(() => {
+                    button.innerText = oldText;
+                    button.classList.remove('copied');
+                    toast.classList.remove('show');
+                }, 1500);
+            }).catch(err => {
+                console.error('حدث خطأ أثناء النسخ: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
